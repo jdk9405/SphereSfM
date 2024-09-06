@@ -55,6 +55,20 @@ class DatabaseCache {
  public:
   DatabaseCache();
 
+  // Load cameras, images, features, and matches from database.
+  //
+  // @param database              Source database from which to load data.
+  // @param min_num_matches       Only load image pairs with a minimum number
+  //                              of matches.
+  // @param ignore_watermarks     Whether to ignore watermark image pairs.
+  // @param image_names           Whether to use only load the data for a subset
+  //                              of the images. All images are used if empty.
+  static std::shared_ptr<DatabaseCache> Create(
+      const Database& database,
+      size_t min_num_matches,
+      bool ignore_watermarks,
+      const std::unordered_set<std::string>& image_names);
+
   // Get number of objects.
   inline size_t NumCameras() const;
   inline size_t NumImages() const;

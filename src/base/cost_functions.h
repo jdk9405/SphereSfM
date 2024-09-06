@@ -490,33 +490,51 @@ class SphericalRelativePoseCostFunction {
   const double z2_;
 };
 
-inline void SetQuaternionManifold(ceres::Problem* problem, double* qvec) {
-#if CERES_VERSION_MAJOR >= 2 && CERES_VERSION_MINOR >= 1
-  problem->SetManifold(qvec, new ceres::QuaternionManifold);
-#else
-  problem->SetParameterization(qvec, new ceres::QuaternionParameterization);
-#endif
-}
+// inline void SetQuaternionManifold(ceres::Problem* problem, double* qvec) {
+// #if CERES_VERSION_MAJOR >= 2 && CERES_VERSION_MINOR >= 1
+//   problem->SetManifold(qvec, new ceres::QuaternionManifold);
+// #else
+//   problem->SetParameterization(qvec, new ceres::QuaternionParameterization);
+// #endif
+// }
 
-inline void SetSubsetManifold(int size, const std::vector<int>& constant_params,
-                              ceres::Problem* problem, double* params) {
-#if CERES_VERSION_MAJOR >= 2 && CERES_VERSION_MINOR >= 1
-  problem->SetManifold(params,
-                       new ceres::SubsetManifold(size, constant_params));
-#else
-  problem->SetParameterization(
-      params, new ceres::SubsetParameterization(size, constant_params));
-#endif
-}
+// inline void SetSubsetManifold(int size, const std::vector<int>& constant_params,
+//                               ceres::Problem* problem, double* params) {
+// #if CERES_VERSION_MAJOR >= 2 && CERES_VERSION_MINOR >= 1
+//   problem->SetManifold(params,
+//                        new ceres::SubsetManifold(size, constant_params));
+// #else
+//   problem->SetParameterization(
+//       params, new ceres::SubsetParameterization(size, constant_params));
+// #endif
+// }
 
-template <int size>
-inline void SetSphereManifold(ceres::Problem* problem, double* params) {
-#if CERES_VERSION_MAJOR >= 2 && CERES_VERSION_MINOR >= 1
-  problem->SetManifold(params, new ceres::SphereManifold<size>);
-#else
-  problem->SetParameterization(
-      params, new ceres::HomogeneousVectorParameterization(size));
-#endif
+// template <int size>
+// inline void SetSphereManifold(ceres::Problem* problem, double* params) {
+// #if CERES_VERSION_MAJOR >= 2 && CERES_VERSION_MINOR >= 1
+//   problem->SetManifold(params, new ceres::SphereManifold<size>);
+// #else
+//   problem->SetParameterization(
+//       params, new ceres::HomogeneousVectorParameterization(size));
+// #endif
+// }
+
+
+template <template <typename> class CostFunction, typename... Args>
+// ceres::CostFunction* CameraCostFunction(const CameraModelId camera_model_id,
+//                                         Args&&... args) {
+ceres::CostFunction* CameraCostFunction(const int camera_model_id,
+                                        Args&&... args) {
+  switch (camera_model_id) {
+#define CAMERA_MODEL_CASE(CameraModel)                                     \
+  case CameraModel::kModelId:                                              \
+    return CostFunction<CameraModel>::Create(std::forward<Args>(args)...); \
+    break;
+
+    CAMERA_MODEL_SWITCH_CASES
+
+#undef CAMERA_MODEL_CASE
+  }
 }
 
 }  // namespace colmap

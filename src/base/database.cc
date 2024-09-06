@@ -436,6 +436,18 @@ std::vector<Image> Database::ReadAllImages() const {
   return images;
 }
 
+PosePrior Database::ReadPosePrior(const image_t image_id) const {
+  SQLITE3_CALL(sqlite3_bind_int64(sql_stmt_read_pose_prior_, 1, image_id));
+  PosePrior prior;
+  const int rc = SQLITE3_CALL(sqlite3_step(sql_stmt_read_pose_prior_));
+  if (rc == SQLITE_ROW) {
+    prior.position = ReadStaticMatrixBlob<Eigen::Vector3d>(sql_stmt_read_pose_prior_, rc, 1);
+    prior.coordinate_system = static_cast<PosePrior::CoordinateSystem>(sqlite3_column_int64(sql_stmt_read_pose_prior_, 2));
+  }
+  SQLITE3_CALL(sqlite3_reset(sql_stmt_read_pose_prior_));
+  return prior;
+}
+
 FeatureKeypoints Database::ReadKeypoints(const image_t image_id) const {
   SQLITE3_CALL(sqlite3_bind_int64(sql_stmt_read_keypoints_, 1, image_id));
 
@@ -1108,6 +1120,11 @@ void Database::PrepareSQLStatements() {
   SQLITE3_CALL(sqlite3_prepare_v2(database_, sql.c_str(), -1,
                                   &sql_stmt_read_images_, 0));
   sql_stmts_.push_back(sql_stmt_read_images_);
+
+  sql = "SELECT * FROM pose_priors WHERE image_id = ?;";
+  SQLITE3_CALL(sqlite3_prepare_v2(database_, sql.c_str(), -1,
+                                  &sql_stmt_read_pose_prior_, 0));
+  sql_stmts_.push_back(sql_stmt_read_pose_prior_);
 
   sql = "SELECT rows, cols, data FROM keypoints WHERE image_id = ?;";
   SQLITE3_CALL(sqlite3_prepare_v2(database_, sql.c_str(), -1,

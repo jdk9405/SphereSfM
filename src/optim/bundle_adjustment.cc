@@ -44,6 +44,8 @@
 #include "util/threading.h"
 #include "util/timer.h"
 
+#include "estimators//manifold.h"
+
 namespace colmap {
 
 ////////////////////////////////////////////////////////////////////////////////

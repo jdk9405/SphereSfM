@@ -738,6 +738,26 @@ double Reconstruction::ComputeMeanReprojectionError() const {
   }
 }
 
+void Reconstruction::UpdatePoint3DErrors() {
+  for (auto& point3D : points3D_) {
+    if (point3D.second.Track().Length() == 0) {
+      point3D.second.SetError(0);
+      continue;
+    }
+
+    double total_error = 0;
+    for (const auto& track_el : point3D.second.Track().Elements()) {
+      const auto& image = Image(track_el.point2D_idx);
+      const auto& point2D = image.Point2D(track_el.point2D_idx);
+      const auto& camera = Camera(image.CameraId());
+
+      total_error += std::sqrt(CalculateSquaredReprojectionError(point2D.XY(), point3D.second.XYZ(), image.CamFromWorld().ToMatrix(), camera));
+    }
+    total_error /= point3D.second.Track().Length();
+    point3D.second.SetError(total_error);
+  }
+}
+
 void Reconstruction::Read(const std::string& path) {
   if (ExistsFile(JoinPaths(path, "cameras.bin")) &&
       ExistsFile(JoinPaths(path, "images.bin")) &&

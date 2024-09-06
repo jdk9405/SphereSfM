@@ -106,6 +106,23 @@ static const std::map<int, CameraType> kCameraType = {
     {11, CameraType::CameraType_SPHERICAL}     // SphereCameraModel
 };
 
+// DK, to be compatiable with colmap > 3.9..
+enum class CameraModelId {
+  kInvalid = -1,
+  kSimplePinhole = 0,
+  kPinhole = 1,
+  kSimpleRadial = 2,
+  kRadial = 3,
+  kOpenCV = 4,
+  kOpenCVFisheye = 5,
+  kFullOpenCV = 6,
+  kFOV = 7,
+  kSimpleRadialFisheye = 8,
+  kRadialFisheye = 9,
+  kThinPrismFisheye = 10,
+};
+// DK
+
 static const int kInvalidCameraModelId = -1;
 
 #ifndef CAMERA_MODEL_DEFINITIONS

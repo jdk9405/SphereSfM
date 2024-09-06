@@ -43,6 +43,8 @@
 #include "util/misc.h"
 #include "util/threading.h"
 
+#include "estimators/manifold.h"
+
 namespace colmap {
 namespace {
 

@@ -45,6 +45,8 @@
 #include "feature/types.h"
 #include "util/types.h"
 
+#include "base/gps.h"
+
 namespace colmap {
 
 // Database class to read and write images, features, cameras, matches, etc.
@@ -145,6 +147,8 @@ class Database {
   Image ReadImage(const image_t image_id) const;
   Image ReadImageWithName(const std::string& name) const;
   std::vector<Image> ReadAllImages() const;
+
+  PosePrior ReadPosePrior(image_t image_id) const;
 
   FeatureKeypoints ReadKeypoints(const image_t image_id) const;
   FeatureDescriptors ReadDescriptors(const image_t image_id) const;
@@ -313,6 +317,7 @@ class Database {
   sqlite3_stmt* sql_stmt_read_image_id_ = nullptr;
   sqlite3_stmt* sql_stmt_read_image_name_ = nullptr;
   sqlite3_stmt* sql_stmt_read_images_ = nullptr;
+  sqlite3_stmt* sql_stmt_read_pose_prior_ = nullptr;
   sqlite3_stmt* sql_stmt_read_keypoints_ = nullptr;
   sqlite3_stmt* sql_stmt_read_descriptors_ = nullptr;
   sqlite3_stmt* sql_stmt_read_matches_ = nullptr;

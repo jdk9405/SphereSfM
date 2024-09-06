@@ -45,6 +45,8 @@
 #include "util/math.h"
 #include "util/types.h"
 
+#include "base/rigid3.h"
+
 namespace colmap {
 
 // Class that holds information about an image. An image is the product of one
@@ -87,6 +89,10 @@ class Image {
   // Get the number of triangulations, i.e. the number of points that
   // are part of a 3D point track.
   inline point2D_t NumPoints3D() const;
+
+  // World to camera pose.
+  inline const Rigid3d& CamFromWorld() const;
+  inline Rigid3d& CamFromWorld();
 
   // Get the number of observations, i.e. the number of image points that
   // have at least one correspondence to another image.
@@ -213,6 +219,9 @@ class Image {
   // where `point3D_id != kInvalidPoint3DId`.
   point2D_t num_points3D_;
 
+  // The pose of the image, defined as the transformation from world to camera.
+  Rigid3d cam_from_world_;
+
   // The number of image points that have at least one correspondence to
   // another image.
   point2D_t num_observations_;
@@ -276,6 +285,10 @@ point2D_t Image::NumPoints2D() const {
 }
 
 point2D_t Image::NumPoints3D() const { return num_points3D_; }
+
+const Rigid3d& Image::CamFromWorld() const { return cam_from_world_; }
+
+Rigid3d& Image::CamFromWorld() { return cam_from_world_; }
 
 point2D_t Image::NumObservations() const { return num_observations_; }
 
